@@ -1,16 +1,19 @@
-import { Link, router } from "expo-router";
-import {
-  Text,
-  View,
-  StyleSheet,
-  Image,
-  SafeAreaView,
-  ScrollView,
-} from "react-native";
+import { Redirect, router } from "expo-router";
+import { Text, View, Image, SafeAreaView, ScrollView } from "react-native";
 import { images } from "../constants";
 import CustomButton from "@/components/CustomButton";
+import { useAuth } from "@/contexts/AuthContext";
 
-export default function Index() {
+export default function OnboardingPage() {
+  const { isLoading, isLoggedIn } = useAuth();
+
+  if (isLoading) {
+    return <Text>Loading...</Text>;
+  }
+  if (isLoggedIn) {
+    return <Redirect href="/home" />;
+  }
+
   return (
     <SafeAreaView className="flex-1 bg-primary items-center justify-center">
       <ScrollView
@@ -36,14 +39,14 @@ export default function Index() {
           <View className="relative mt-5">
             <Text className="text-2xl font-psemibold text-center text-secondary">
               Relive your moments anywhere with{" "}
-              <Text className="text-orange-600 font-pbold">PhotoAsis</Text>
+              <Text className="text-accent font-pbold">PhotoAsis</Text>
             </Text>
             <Text className="text-center mt-5">
               Capture your most precious memories and organize them into albums
             </Text>
           </View>
           <CustomButton
-            onPress={() => router.push("/home")}
+            onPress={() => router.push("/sign-in")}
             text="Continue with email"
             containerStyles="w-full mt-7"
           />
