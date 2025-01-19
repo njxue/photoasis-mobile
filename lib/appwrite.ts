@@ -1,4 +1,4 @@
-import { AppwriteListResponse, UserDocument } from "@/types/appwrite";
+import { AlbumDocument, UserDocument } from "@/types/appwrite";
 import User from "@/types/User";
 import {
   Client,
@@ -18,6 +18,7 @@ export const config = {
   databaseId: "678b4d32002be826b2f2",
   userCollectionId: "678b4d49000fe4e4c5ec",
   photoCollectionId: "678b4d6f0001e040399f",
+  albumCollectionId: "678ca213003a4c78273b",
   storageId: "678b4e1e00262cf82a2e",
 };
 
@@ -28,6 +29,7 @@ const {
   databaseId,
   userCollectionId,
   photoCollectionId,
+  albumCollectionId,
   storageId,
 } = config;
 
@@ -112,4 +114,26 @@ export const getCurrUser = async (): Promise<User> => {
 const formatUser = (userDocument: UserDocument): User => {
   const { accountId, username, email, avatar } = userDocument;
   return { accountId, username, email, avatar };
+};
+
+const formatAlbums = (albumDocuments: AlbumDocument[]): Album[] => {
+  return albumDocuments.map((albumDocument) => {
+    const { name, thumbnail, photos, userId, $id } = albumDocument;
+    return { name, thumbnail, photos, userId, albumId: $id };
+  });
+};
+
+export const getUserAlbums = async (userId: string) => {
+  try {
+    const albums = await databases.listDocuments(
+      databaseId,
+      albumCollectionId,
+      [Query.equal("userId", userId)]
+    );
+    const albumDocuments: AlbumDocument[] = albums.documents as AlbumDocument[];
+    return formatAlbums(albumDocuments);
+  } catch (err: any) {
+    console.log(err);
+    throw new Error(err);
+  }
 };

@@ -6,3 +6,10 @@ export interface UserDocument extends Models.Document {
   email: string;
   avatar: string;
 }
+
+export interface AlbumDocument extends Models.Document {
+  name: string;
+  photos: string[];
+  thumbnail: string;
+  userId: string;
+}

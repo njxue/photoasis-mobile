@@ -5,7 +5,7 @@ import { Stack, Tabs } from "expo-router";
 const TabsLayout = () => {
   return (
     <Tabs>
-      <Tabs.Screen name="home" />
+      <Tabs.Screen name="home" options={{ headerShown: false }} />
       <Tabs.Screen name="create" />
       <Tabs.Screen name="profile" />
     </Tabs>
