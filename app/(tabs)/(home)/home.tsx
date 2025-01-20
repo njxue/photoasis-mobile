@@ -4,6 +4,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useAuth } from "@/contexts/AuthContext";
 import useAppwrite from "@/hooks/useAppwrite";
 import { getUserAlbums } from "@/lib/appwrite";
+import { Href, router } from "expo-router";
 
 const Home = () => {
   const { user } = useAuth();
@@ -11,7 +12,7 @@ const Home = () => {
     data: albums,
     refetch,
     isLoading,
-  } = useAppwrite(() => getUserAlbums(user!.accountId));
+  } = useAppwrite<Album[]>(() => getUserAlbums(user!.accountId));
 
   //console.log(albums);
   return (
@@ -25,7 +26,8 @@ const Home = () => {
         renderItem={({ item: album }) => (
           <TouchableOpacity
             className="relative w-1/2 h-[140px]"
-            activeOpacity={0.5}>
+            activeOpacity={0.5}
+            onPress={() => router.push(`/album/${album.albumId}` as Href)}>
             <Image
               source={{ uri: album.thumbnail }}
               resizeMode="cover"

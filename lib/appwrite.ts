@@ -1,4 +1,5 @@
-import { AlbumDocument, UserDocument } from "@/types/appwrite";
+import { AlbumDocument, PhotoDocument, UserDocument } from "@/types/appwrite";
+import { Photo } from "@/types/Photo";
 import User from "@/types/User";
 import {
   Client,
@@ -116,11 +117,14 @@ const formatUser = (userDocument: UserDocument): User => {
   return { accountId, username, email, avatar };
 };
 
-const formatAlbums = (albumDocuments: AlbumDocument[]): Album[] => {
-  return albumDocuments.map((albumDocument) => {
-    const { name, thumbnail, photos, userId, $id } = albumDocument;
-    return { name, thumbnail, photos, userId, albumId: $id };
-  });
+const formatAlbum = (albumDocument: AlbumDocument): Album => {
+  const { name, thumbnail, photos, userId, $id } = albumDocument;
+  return { name, thumbnail, photos, userId, albumId: $id };
+};
+
+const formatPhoto = (photoDocument: PhotoDocument): Photo => {
+  const { name, url, $id } = photoDocument;
+  return { name, url, id: $id };
 };
 
 export const getUserAlbums = async (userId: string) => {
@@ -131,7 +135,44 @@ export const getUserAlbums = async (userId: string) => {
       [Query.equal("userId", userId)]
     );
     const albumDocuments: AlbumDocument[] = albums.documents as AlbumDocument[];
-    return formatAlbums(albumDocuments);
+    return albumDocuments.map(formatAlbum);
+  } catch (err: any) {
+    console.log(err);
+    throw new Error(err);
+  }
+};
+
+export const getPhotos = async (photoIds: string[]) => {
+  const photoDocuments = await databases.listDocuments(
+    databaseId,
+    photoCollectionId,
+    [Query.contains("$id", photoIds)]
+  );
+  const photos = photoDocuments.documents as PhotoDocument[];
+  return photos.map(formatPhoto);
+};
+
+export const getAlbumData = async (
+  albumId: string
+): Promise<{ album: Album; photos: Photo[] }> => {
+  try {
+    const albumDocument = await databases.listDocuments(
+      databaseId,
+      albumCollectionId,
+      [Query.equal("$id", albumId), Query.limit(1)]
+    );
+    if (!albumDocument.documents?.[0]) {
+      throw new Error("Album not found");
+    }
+    const album = formatAlbum(albumDocument.documents[0] as AlbumDocument);
+
+    let photos: Photo[] = [];
+
+    if (album.photos && album.photos?.length > 0) {
+      photos = await getPhotos(album.photos);
+    }
+
+    return { album, photos };
   } catch (err: any) {
     console.log(err);
     throw new Error(err);

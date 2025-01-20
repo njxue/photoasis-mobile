@@ -1,8 +1,8 @@
 import { Alert } from "react-native";
 import { useEffect, useState } from "react";
 
-const useAppwrite = (fn: (...args: any[]) => any) => {
-  const [data, setData] = useState<any[]>([]);
+function useAppwrite<T>(fn: (...args: any[]) => Promise<T>) {
+  const [data, setData] = useState<T | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const fetchData = async () => {
@@ -24,6 +24,6 @@ const useAppwrite = (fn: (...args: any[]) => any) => {
   const refetch = fetchData;
 
   return { data, isLoading, refetch };
-};
+}
 
 export default useAppwrite;

@@ -13,3 +13,8 @@ export interface AlbumDocument extends Models.Document {
   thumbnail: string;
   userId: string;
 }
+
+export interface PhotoDocument extends Models.Document {
+  name: string;
+  url: string;
+}
